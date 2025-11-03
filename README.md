@@ -1,1 +1,1 @@
-# pamrpgetec
+# Paulo Renan e Lucas Daido
