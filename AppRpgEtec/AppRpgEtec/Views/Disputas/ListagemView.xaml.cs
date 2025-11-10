@@ -4,6 +4,8 @@ public partial class ListagemView : ContentPage
 {
 	public ListagemView()
 	{
-		InitializeComponent();
-	}
+        InitializeComponent();
+        viewModel = new DisputaViewModel();
+        BindingContext = viewModel;
+    }
 }
