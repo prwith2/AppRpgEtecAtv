@@ -13,7 +13,8 @@ namespace AppRpgEtec.ViewModels.Usuarios
     public class ImagemUsuarioViewModel : BaseViewModel
     {
         private UsuarioService uService;
-        private static string conexaoAzureStorage = "DefaultEndpointsProtocol=https;AccountName=lupastorage;AccountKey=V5OUXopGQhXe8fhI/B1KJVo8wdBW3pQ8W0wdb4qNMUs2QlIVTS2Aic3q3WQO3V87m5SYBn4j0zpk+AStsyaymQ==;EndpointSuffix=core.windows.net";
+        //tive que retirar a chave pois o github não permitia subir o projeto
+        //private static string conexaoAzureStorage = ;//
         private static string container = "arquivos";//nome do container criado
 
         public ImagemUsuarioViewModel()
