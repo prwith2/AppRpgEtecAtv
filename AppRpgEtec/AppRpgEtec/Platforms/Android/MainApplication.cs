@@ -1,5 +1,8 @@
 ﻿using Android.App;
 using Android.Runtime;
+using AppRpgEtec.Models;
+using Javax.Security.Auth.Login;
+using System.Net.Mail;
 
 namespace AppRpgEtec
 {
@@ -11,6 +14,6 @@ namespace AppRpgEtec
         {
         }
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();        
     }
 }

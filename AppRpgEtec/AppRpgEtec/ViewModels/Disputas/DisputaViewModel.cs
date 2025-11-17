@@ -1,24 +1,17 @@
 ﻿using AppRpgEtec.Models;
-using AppRpgEtec.Models.Enuns;
 using AppRpgEtec.Services.Personagens;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-
 
 namespace AppRpgEtec.ViewModels.Disputas
 {
+    // Matheus Santos | Luca Kenzo
     public class DisputaViewModel : BaseViewModel
     {
         private PersonagemService pService;
         public ObservableCollection<Personagem> PersonagensEncontrados { get; set; }
         public Personagem Atacante { get; set; }
         public Personagem Oponente { get; set; }
-
         public DisputaViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
@@ -28,11 +21,12 @@ namespace AppRpgEtec.ViewModels.Disputas
             Oponente = new Personagem();
 
             PersonagensEncontrados = new ObservableCollection<Personagem>();
-            PesquisarPersonagensCommand =
-                new Command<string>(async (string pesquisa) => { await PesquisarPersonagens(pesquisa); });
+
+            PesquisarPersonagemCommand = new Command<string>(async (string pesquisa) => { await PesquisarPersonagens(pesquisa); });
         }
 
-        public ICommand PesquisarPersonagensCommand { get; set; }
+        public ICommand PesquisarPersonagemCommand { get; set; }
+
         public async Task PesquisarPersonagens(string textoPesquisaPersonagem)
         {
             try
@@ -42,25 +36,18 @@ namespace AppRpgEtec.ViewModels.Disputas
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
-        public string DescricaoPersonagemAtacante
-        {
-            get => Atacante.Nome;
-        }
 
-        public string DescricaoPersonagemOponente
-        {
-            get => Oponente.Nome;
-        }
+        public string DescricaoPersonagemAtacante { get => Atacante.Nome; }
+        public string DescricaoPersonagemOponente { get => Oponente.Nome; }
+
         public async void SelecionarPersonagem(Personagem p)
         {
             try
             {
-                string tipoCombatente = await Application.Current.MainPage
-                    .DisplayActionSheet("Atacante ou Oponente?", "Cancelar", "", "Atacante", "Oponente");
+                string tipoCombatente = await Application.Current.MainPage.DisplayActionSheet("Atacante ou Oponente?", "Cancelar", "", "Atacante", "Oponente");
 
                 if (tipoCombatente == "Atacante")
                 {
@@ -73,18 +60,18 @@ namespace AppRpgEtec.ViewModels.Disputas
                     OnPropertyChanged(nameof(DescricaoPersonagemOponente));
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
+
         private Personagem personagemSelecionado;
         public Personagem PersonagemSelecionado
         {
             set
             {
-                if (value != null)
+                if(value != null)
                 {
                     personagemSelecionado = value;
                     SelecionarPersonagem(personagemSelecionado);
@@ -93,27 +80,25 @@ namespace AppRpgEtec.ViewModels.Disputas
                 }
             }
         }
+
         private string textoBuscaDigitado = string.Empty;
         public string TextoBuscaDigitado
         {
             get { return textoBuscaDigitado; }
             set
             {
-                if ((value != null && !string.IsNullOrEmpty(value) && value.Length > 0))
+                //Verifique se não é nulo, se não é vazio e se o tamanho do texto é maior que zero.
+                if (value != null && !string.IsNullOrEmpty(value) && value.Length > 0)
                 {
                     textoBuscaDigitado = value;
                     _ = PesquisarPersonagens(textoBuscaDigitado);
-
                 }
                 else
                 {
+                    //Limpa o list view que exibe o resultado da pesquisa
                     PersonagensEncontrados.Clear();
                 }
             }
-        
-         }
-
-
-
+        }
     }
 }

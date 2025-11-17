@@ -1,29 +1,30 @@
-﻿using System;
+﻿using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Maps;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AppRpgEtec.Models;
-using AppRpgEtec.Services.Usuarios;
-using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
+using System.ComponentModel; // Adicione isso
+using System.Runtime.CompilerServices; // Adicione isso
 using Map = Microsoft.Maui.Controls.Maps.Map;
+using AppRpgEtec.Services.Usuarios;
+using System.Collections.ObjectModel;
+using AppRpgEtec.Models;
 
 namespace AppRpgEtec.ViewModels.Usuarios
 {
-    class LocalizacaoViewModel : BaseViewModel
+    public class LocalizacaoViewModel : INotifyPropertyChanged
     {
+        private Map meuMapa;
         private UsuarioService uService;
-
         public LocalizacaoViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
             uService = new UsuarioService(token);
         }
-        private Map meuMapa;
 
+        public event PropertyChangedEventHandler PropertyChanged;
         public Map MeuMapa
         {
             get => meuMapa;
@@ -35,20 +36,25 @@ namespace AppRpgEtec.ViewModels.Usuarios
                     OnPropertyChanged();
                 }
             }
+        }
 
-     
+        // Método para disparar o evento PropertyChanged
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public async void InicializarMapa()
         {
             try
             {
+                //Coordenadas geograficas da escola
                 Location location = new Location(-23.5200241d, -46.596498d);
                 Pin pinEtec = new Pin()
                 {
                     Type = PinType.Place,
                     Label = "Etec Horácio",
-                    Address = "Rua alcantara, 113, vila Guilherme",
+                    Address = "Rua alcântara, 113, Vila Guilherme",
                     Location = location
                 };
 
@@ -57,15 +63,15 @@ namespace AppRpgEtec.ViewModels.Usuarios
                 map.Pins.Add(pinEtec);
                 map.MoveToRegion(mapSpan);
 
-                MeuMapa = map;
+                meuMapa = map;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Erro", e.Message, "OK");
+                await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
             }
         }
 
-        public async void ExibirUsuarioNoMapa()
+        public async void ExibirUsuariosNoMapa()
         {
             try
             {
@@ -93,7 +99,7 @@ namespace AppRpgEtec.ViewModels.Usuarios
                 }
                 MeuMapa = map;
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 await Application.Current.MainPage.DisplayAlert("Erro", ex.Message, "OK");
             }

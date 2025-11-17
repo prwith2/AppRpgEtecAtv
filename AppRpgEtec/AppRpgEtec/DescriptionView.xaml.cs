@@ -1,4 +1,4 @@
-namespace AppRpgEtec.Views;
+namespace AppRpgEtec;
 
 public partial class DescriptionView : ContentPage
 {

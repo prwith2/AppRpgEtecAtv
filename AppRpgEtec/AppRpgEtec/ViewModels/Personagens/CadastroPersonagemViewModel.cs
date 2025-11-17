@@ -1,12 +1,7 @@
 ﻿using AppRpgEtec.Models;
 using AppRpgEtec.Models.Enuns;
 using AppRpgEtec.Services.Personagens;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace AppRpgEtec.ViewModels.Personagens
@@ -16,15 +11,13 @@ namespace AppRpgEtec.ViewModels.Personagens
     {
         private PersonagemService pService;
         public ICommand SalvarCommand { get; }
-        public ICommand CancelarCommand { get; set; }
-        
-
+        public ICommand CancelarCommand { get; }
         public CadastroPersonagemViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
             pService = new PersonagemService(token);
-
             _ = ObterClasses();
+
             SalvarCommand = new Command(async () => { await SalvarPersonagem(); });
             CancelarCommand = new Command(async => CancelarCadastro());
         }
@@ -44,106 +37,39 @@ namespace AppRpgEtec.ViewModels.Personagens
         private int vitorias;
         private int derrotas;
 
-        public int Id
-        {
-            get => id;
-            set
-            {
-                id = value;
-                OnPropertyChanged(nameof(Id));//Informa mundaça de estado para a View para ViewModel ou vice-versa de acordo com a herança da BaseViewModel
-            }
-        }
-
-        public string Nome
-        {
-            get => nome;
-            set
-            {
-                nome = value;
-                OnPropertyChanged(nameof(Nome));
-            }
-        }
-
-        public int PontosVida
-        {
-            get => pontosVida;
-            set
-            {
-                pontosVida = value;
-                OnPropertyChanged(nameof(PontosVida));
-            }
-        }
-
-        public int Forca
-        {
-            get => forca;
-            set
-            {
-                forca = value;
-                OnPropertyChanged(nameof(Forca));
-            }
-        }
-
-        public int Defesa
-        {
-            get => defesa;
-            set
-            {
-                defesa = value;
-                OnPropertyChanged(nameof(Defesa));
-            }
-        }
-
-        public int Inteligencia
-        {
-            get => inteligencia;
-            set
-            {
-                inteligencia = value;
-                OnPropertyChanged(nameof(Inteligencia));
-            }
-        }
-
-        public int Disputas
-        {
-            get => disputas;
-            set
-            {
-                disputas = value;
-                OnPropertyChanged(nameof(Disputas));
-            }
-        }
-
-        public int Vitorias
-        {
-            get => vitorias;
-            set
-            {
-                vitorias = value;
-                OnPropertyChanged(nameof(Vitorias));
-            }
-        }
-
-        public int Derrotas
-        {
-            get => derrotas;
-            set
-            {
-                derrotas = value;
-                OnPropertyChanged(nameof(Derrotas));
-            }
-        }
+        public int Id { get => id; set { id = value; OnPropertyChanged(); } }
+        public string Nome { get => nome; set { nome = value; OnPropertyChanged(); } }
+        public int PontosVida { get => pontosVida; set { pontosVida = value; OnPropertyChanged(); } }
+        public int Forca { get => forca; set { forca = value; OnPropertyChanged(); } }
+        public int Defesa { get => defesa; set { defesa = value; OnPropertyChanged(); } }
+        public int Inteligencia { get => inteligencia; set { inteligencia = value; OnPropertyChanged(); } }
+        public int Disputas { get => disputas; set { disputas = value; OnPropertyChanged(); } }
+        public int Vitorias { get => vitorias; set { vitorias = value; OnPropertyChanged(); } }
+        public int Derrotas { get => derrotas; set { derrotas = value; OnPropertyChanged(); } }
 
         private ObservableCollection<TipoClasse> listaTiposClasse;
         public ObservableCollection<TipoClasse> ListaTiposClasse
         {
-            get { return listaTiposClasse; }
+            get {  return listaTiposClasse; }
             set
             {
-                if (value != null)
+                if (value == null)
                 {
                     listaTiposClasse = value;
-                    OnPropertyChanged(nameof(ListaTiposClasse));
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string personagemSelecionadoId;
+        public string PersonagemSelecionadoId
+        {
+            set
+            {
+                if ( value != null )
+                {
+                    personagemSelecionadoId = Uri.UnescapeDataString(value);
+                    CarregarPersonagem();
                 }
             }
         }
@@ -160,8 +86,7 @@ namespace AppRpgEtec.ViewModels.Personagens
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
 
@@ -169,12 +94,12 @@ namespace AppRpgEtec.ViewModels.Personagens
         public TipoClasse TipoClasseSelecionado
         {
             get { return tipoClasseSelecionado; }
-            set
+            set 
             {
                 if (value != null)
                 {
                     tipoClasseSelecionado = value;
-                    OnPropertyChanged(nameof(TipoClasseSelecionado));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -196,28 +121,24 @@ namespace AppRpgEtec.ViewModels.Personagens
                     Id = this.id,
                     Classe = (ClasseEnum)tipoClasseSelecionado.Id
                 };
-                if (model.Id == 0)
-                    await pService.PostPersonagemAsync(model);               
+                if (model.Id == 0) await pService.PostPersonagemAsync(model);
                 else
                     await pService.PutPersonagemAsync(model);
+                await Application.Current.MainPage.DisplayAlert("Mensagem", "Dados salvos com sucesso!", "Ok");
+                await Shell.Current.GoToAsync(".."); //Remove a pagina atual da pilha de paginas
 
-                await Application.Current.MainPage
-                       .DisplayAlert("Mensagem", "Dados salvos com sucesso!", "Ok");
-
-                await Shell.Current.GoToAsync(".."); //Remove a página atual da pilha de páginas                 
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
+
         public async void CarregarPersonagem()
         {
             try
             {
                 Personagem p = await pService.GetPersonagemAsync(int.Parse(personagemSelecionadoId));
-
                 this.Nome = p.Nome;
                 this.PontosVida = p.PontosVida;
                 this.Defesa = p.Defesa;
@@ -228,32 +149,12 @@ namespace AppRpgEtec.ViewModels.Personagens
                 this.Vitorias = p.Vitorias;
                 this.Id = p.Id;
 
-                TipoClasseSelecionado = this.ListaTiposClasse
-                .FirstOrDefault(tClasse => tClasse.Id == (int)p.Classe);
+                TipoClasseSelecionado = this.ListaTiposClasse.FirstOrDefault(tClasse => tClasse.Id == (int)p.Classe);
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
-
-        private string personagemSelecionadoId;//CTRL + R,E
-        public string PersonagemSelecionadoId
-        {
-            set
-            {
-                if (value != null)
-                {
-                    personagemSelecionadoId = Uri.UnescapeDataString(value);
-                    CarregarPersonagem();
-                }
-            }
-        }
-
-
-
-
-
     }
 }

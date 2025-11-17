@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using AppRpgEtec.Models;
-using AppRpgEtec.Services.Usuarios;
+﻿using AppRpgEtec.Services.Usuarios;
 using Azure.Storage.Blobs;
+using AppRpgEtec.ViewModels.Usuarios;
+
 namespace AppRpgEtec.ViewModels
 {
-
     public class AppShellViewModel : BaseViewModel
     {
-        private UsuarioService uService;
+        private UsuarioService uService;        
         public AppShellViewModel()
         {
             string token = Preferences.Get("UsuarioToken", string.Empty);
             uService = new UsuarioService(token);
 
             CarregarUsuarioAzure();
-
         }
 
         private byte[] foto;
@@ -40,7 +32,7 @@ namespace AppRpgEtec.ViewModels
             {
                 int usuarioId = Preferences.Get("UsuarioId", 0);
                 string filename = $"{usuarioId}.jpg";
-                var blobClient = new BlobClient(conexaoAzureStorage,container,filename);
+                var blobClient = new BlobClient(ImagemUsuarioViewModel.ConexaoAzureStorage, ImagemUsuarioViewModel.Container, filename);
 
                 if (blobClient.Exists())
                 {
@@ -54,14 +46,10 @@ namespace AppRpgEtec.ViewModels
                     Foto = fileBytes;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                await Application.Current.MainPage
-                    .DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
     }
-
-
-
 }

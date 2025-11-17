@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using AppRpgEtec.Models;
 using AppRpgEtec.Services.Usuarios;
 using Azure.Storage.Blobs;
@@ -14,7 +9,10 @@ namespace AppRpgEtec.ViewModels.Usuarios
     {
         private UsuarioService uService;
         private static string conexaoAzureStorage = "DefaultEndpointsProtocol=https;AccountName=lupastorage;AccountKey=V5OUXopGQhXe8fhI/B1KJVo8wdBW3pQ8W0wdb4qNMUs2QlIVTS2Aic3q3WQO3V87m5SYBn4j0zpk+AStsyaymQ==;EndpointSuffix=core.windows.net";
-        private static string container = "arquivos";//nome do container criado
+        private static string container = "arquivos";
+
+        public static string ConexaoAzureStorage => conexaoAzureStorage;
+        public static string Container => container;
 
         public ImagemUsuarioViewModel()
         {
@@ -29,21 +27,11 @@ namespace AppRpgEtec.ViewModels.Usuarios
         }
 
         public ICommand FotografarCommand { get; }
+
         public ICommand SalvarImagemCommand { get; }
         public ICommand AbrirGaleriaCommand { get; }
 
         private ImageSource fonteImagem;
-        public ImageSource FontImagem
-        {
-            get { return fonteImagem; }
-            set
-            {
-                fonteImagem = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private byte[] foto;
 
         public ImageSource FonteImagem
         {
@@ -55,33 +43,38 @@ namespace AppRpgEtec.ViewModels.Usuarios
             }
         }
 
+        private byte[] foto;
+
         public byte[] Foto
         {
-            get { return foto; }
+            get => foto;
             set
             {
-                foto = value;
                 OnPropertyChanged();
             }
         }
-
 
         public async void Fotografar()
         {
             try
             {
-                FileResult photo = await MediaPicker.Default.CapturePhotoAsync();
-                if (photo == null)
+                if (MediaPicker.Default.IsCaptureSupported)
                 {
-                    if (MediaPicker.Default.IsCaptureSupported)
+                    FileResult photo = await MediaPicker.Default.CapturePhotoAsync();
+
+                    if (photo != null)
                     {
-                        using (Stream sourceStrem = await photo.OpenReadAsync())
+                        using (Stream sourceStream = await photo.OpenReadAsync())
                         {
                             using (MemoryStream ms = new MemoryStream())
                             {
-                                await sourceStrem.CopyToAsync(ms);
+                                await sourceStream.CopyToAsync(ms); //Conversão do Stream para MemoryStream (arquivo em memoria)
+
+                                //Carregamento do array de bytes a partir do memoria para a propriedade da ViewModel
                                 Foto = ms.ToArray();
-                                fonteImagem = ImageSource.FromStream(() => new MemoryStream());
+
+                                //Carregamento do controle que apresenta a imagem para a ViewModel
+                                FonteImagem = ImageSource.FromStream(() => new MemoryStream(ms.ToArray()));
                             }
                         }
                     }
@@ -89,11 +82,9 @@ namespace AppRpgEtec.ViewModels.Usuarios
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
-
-
 
         public async void SalvarImagemAzure()
         {
@@ -103,47 +94,49 @@ namespace AppRpgEtec.ViewModels.Usuarios
                 u.Foto = foto;
                 u.Id = Preferences.Get("UsuarioId", 0);
 
-                string filename = $"{u.Id}.jpg";
+                string fileName = $"{u.Id}.jpg";
 
-                var blobClient = new BlobClient(conexaoAzureStorage, container, filename);
-
+                //define o BLOB no qual a imagem sera armazenada
+                var blobClient = new BlobClient(conexaoAzureStorage, container, fileName);
 
                 if (blobClient.Exists())
                     blobClient.Delete();
 
-                using (var stream = new MemoryStream())
+                using (var stream = new MemoryStream(u.Foto))
                 {
                     blobClient.Upload(stream);
                 }
 
+                await Application.Current.MainPage.DisplayAlert("Mensagem", "Dados salvos com sucesso!", "Ok");
+                await App.Current.MainPage.Navigation.PopAsync();
             }
             catch (Exception ex)
             {
-
                 await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "Ok");
-
             }
-
-
         }
-
 
         public async void AbrirGaleria()
         {
             try
             {
-                FileResult photo = await MediaPicker.Default.PickPhotoAsync();
-                if (photo == null)
+                if (MediaPicker.Default.IsCaptureSupported)
                 {
-                    if (MediaPicker.Default.IsCaptureSupported)
+                    FileResult photo = await MediaPicker.Default.PickPhotoAsync();
+
+                    if (photo != null)
                     {
-                        using (Stream sourceStrem = await photo.OpenReadAsync())
+                        using (Stream sourceStream = await photo.OpenReadAsync())
                         {
                             using (MemoryStream ms = new MemoryStream())
                             {
-                                await sourceStrem.CopyToAsync(ms);
+                                await sourceStream.CopyToAsync(ms); //Conversão do Stream para MemoryStream (arquivo em memoria)
+
+                                //Carregamento do array de bytes a partir do memoria para a propriedade da ViewModel
                                 Foto = ms.ToArray();
-                                fonteImagem = ImageSource.FromStream(() => new MemoryStream());
+
+                                //Carregamento do controle que apresenta a imagem para a ViewModel
+                                FonteImagem = ImageSource.FromStream(() => new MemoryStream(ms.ToArray()));
                             }
                         }
                     }
@@ -151,10 +144,9 @@ namespace AppRpgEtec.ViewModels.Usuarios
             }
             catch (Exception ex)
             {
-                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "Ok");
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
         }
-
 
         public async void CarregarUsuarioAzure()
         {
@@ -166,7 +158,7 @@ namespace AppRpgEtec.ViewModels.Usuarios
 
                 if (blobClient.Exists())
                 {
-                    byte[] fileBytes;
+                    Byte[] fileBytes;
 
                     using (MemoryStream ms = new MemoryStream())
                     {
@@ -175,17 +167,11 @@ namespace AppRpgEtec.ViewModels.Usuarios
                     }
                     Foto = fileBytes;
                 }
-
-
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + "Detalhes: " + ex.InnerException, "Ok");
-
+                await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
-
-
-
         }
     }
 }

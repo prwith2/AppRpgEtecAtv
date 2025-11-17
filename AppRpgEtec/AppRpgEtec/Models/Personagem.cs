@@ -1,17 +1,16 @@
-﻿using AppRpgEtec.Models.Enuns;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AppRpgEtec.Models.Enuns;
 
 namespace AppRpgEtec.Models
 {
     public class Personagem
     {
-        //Atalho: PROP + TAB
         public int Id { get; set; }
-        public string Nome { get; set; } = string.Empty;
+        public string? Nome { get; set; }
         public int PontosVida { get; set; }
         public int Forca { get; set; }
         public int Defesa { get; set; }

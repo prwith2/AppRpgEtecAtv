@@ -60,22 +60,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Include="D:\Daido 3AI\ImagemUsuarioView.xaml" Link="ImagemUsuarioView.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="8.0.21" />
+		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="9.0.110" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\AboutView.xaml">
+	  <MauiXaml Update="AboutView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\DescriptionView.xaml">
+	  <MauiXaml Update="DescriptionView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Disputas\ListagemView.xaml">
@@ -91,9 +87,6 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Usuarios\ImagemUsuarioView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\Usuarios\ListagemView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\Usuarios\LocalizacaoView.xaml">

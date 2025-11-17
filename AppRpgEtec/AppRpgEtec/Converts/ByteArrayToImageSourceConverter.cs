@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.IO;
-using System.Globalization;
 
-namespace AppRpgEtec.Converters
+namespace AppRpgEtec.Converts
 {
     public class ByteArrayToImageSourceConverter : IValueConverter
     {
@@ -20,7 +19,8 @@ namespace AppRpgEtec.Converters
             }
             return retSource;
         }
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
