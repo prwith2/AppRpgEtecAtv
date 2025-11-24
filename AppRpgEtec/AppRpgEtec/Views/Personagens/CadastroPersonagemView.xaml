@@ -34,7 +34,7 @@ ItemDisplayBinding="{Binding Descricao}" SelectedItem="{Binding TipoClasseSeleci
             <Entry Text="{Binding Derrotas}" FontSize="Medium" Keyboard="Numeric" />
 
             <HorizontalStackLayout Spacing="20">
-                <Button Text="Salvar" Command="{Binding SalvarCommand}"></Button>
+                <Button Text="Salvar" Command="{Binding SalvarCommand}"IsEnabled="{Binding CadastroHabilitado}"></Button>
             </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

@@ -18,7 +18,7 @@ namespace AppRpgEtec.ViewModels.Personagens
             pService = new PersonagemService(token);
             _ = ObterClasses();
 
-            SalvarCommand = new Command(async () => { await SalvarPersonagem(); });
+            SalvarCommand = new Command(async () => { await SalvarPersonagem(); }, () => ValidarCampos());
             CancelarCommand = new Command(async => CancelarCadastro());
         }
 
@@ -38,8 +38,8 @@ namespace AppRpgEtec.ViewModels.Personagens
         private int derrotas;
 
         public int Id { get => id; set { id = value; OnPropertyChanged(); } }
-        public string Nome { get => nome; set { nome = value; OnPropertyChanged(); } }
-        public int PontosVida { get => pontosVida; set { pontosVida = value; OnPropertyChanged(); } }
+        public string Nome { get => nome; set { nome = value; OnPropertyChanged(); ((Command)SalvarCommand).ChangeCanExecute(); } }
+        public int PontosVida { get => pontosVida; set { pontosVida = value; OnPropertyChanged(); OnPropertyChanged(nameof(CadastroHabilitado)); } }
         public int Forca { get => forca; set { forca = value; OnPropertyChanged(); } }
         public int Defesa { get => defesa; set { defesa = value; OnPropertyChanged(); } }
         public int Inteligencia { get => inteligencia; set { inteligencia = value; OnPropertyChanged(); } }
@@ -155,6 +155,20 @@ namespace AppRpgEtec.ViewModels.Personagens
             {
                 await Application.Current.MainPage.DisplayAlert("Ops", ex.Message + " Detalhes: " + ex.InnerException, "Ok");
             }
+        }
+        public bool CadastroHabilitado
+        {
+            get
+            {
+            return (PontosVida > 0);
+            }
+        }
+        public bool ValidarCampos()
+        {
+            return !string.IsNullOrEmpty(Nome)
+                && CadastroHabilitado
+                && Forca != 0
+                && Defesa != 0;
         }
     }
 }
