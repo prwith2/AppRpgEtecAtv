@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace AppRpgEtec.Models
 {
-    // Matheus Santos | Luca Kenzo
     public class Disputas
     {
         public int Id { get; set; }

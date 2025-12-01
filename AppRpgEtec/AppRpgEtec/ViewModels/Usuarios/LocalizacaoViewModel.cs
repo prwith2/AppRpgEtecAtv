@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.ComponentModel; // Adicione isso
-using System.Runtime.CompilerServices; // Adicione isso
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Map = Microsoft.Maui.Controls.Maps.Map;
 using AppRpgEtec.Services.Usuarios;
 using System.Collections.ObjectModel;
